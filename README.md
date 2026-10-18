@@ -1,60 +1,68 @@
-<div align="center">
+# 🍽️ The Royal Spice
 
-<img src="docs/royal-spice-banner.gif" alt="The Royal Spice — Restaurant Website and Management System" width="100%" />
+![Animated banner for The Royal Spice](docs/royal-spice-banner.gif)
 
-# The Royal Spice
-
-**Restaurant Website & Management System**
-
+**Restaurant Website & Management System**  
 *A modern dining experience with a connected restaurant management dashboard.*
 
-![Version](https://img.shields.io/badge/version-2.0-1B3A2E?style=flat-square) ![Python](https://img.shields.io/badge/Python-Flask-EAB869?style=flat-square&labelColor=1B3A2E) ![Database](https://img.shields.io/badge/Database-MySQL-1B3A2E?style=flat-square) ![Status](https://img.shields.io/badge/status-Development%20MVP-E7ECE4?style=flat-square&labelColor=546B5E)
-
-</div>
+![Version](https://img.shields.io/badge/version-2.0-1B3A2E?style=flat-square) ![Python Flask](https://img.shields.io/badge/Python-Flask-EAB869?style=flat-square&labelColor=1B3A2E) ![MySQL](https://img.shields.io/badge/Database-MySQL-1B3A2E?style=flat-square) ![Status](https://img.shields.io/badge/status-Development%20MVP-E7ECE4?style=flat-square&labelColor=546B5E)
 
 ## 🍽️ About the Project
 
-**The Royal Spice** is a dynamic restaurant platform combining an elegant **customer-facing food-ordering website** with a practical **administration and POS dashboard**. Built with Python and Flask, it uses a MySQL database to keep menus, orders, reservations, and promotions connected.
+**The Royal Spice** is a dynamic restaurant platform combining a customer-facing food-ordering website with an administration and POS dashboard. Built with **Python and Flask**, it uses **MySQL** to connect menus, orders, reservations, and promotions.
 
 ## ✨ Key Features
 
-| For Customers | For Restaurant Staff & Admins |
+| Customer Experience | Staff & Admin Dashboard |
 | --- | --- |
-| 🍛 Dynamic food menu with search and category filters | 📊 Dashboard with business summaries |
-| 🛒 Cart, checkout and order receipts | 🧾 Order management and staff POS |
-| 🏷️ Promotional codes and special offers | 🎁 Create, schedule and manage offers |
-| 📅 Table reservation requests | 🍽️ Manage menu items and dining tables |
-| 🚚 Dine-in, takeaway and delivery orders | 👥 Staff, customer and inventory records |
-| 📱 Responsive browsing experience | 📈 Expenses and basic sales reports |
+| 🍛 Searchable menu with category filters | 📊 Business dashboard |
+| 🛒 Shopping cart, checkout & receipts | 🧾 Order management & POS |
+| 🏷️ Promotions and discount codes | 🎁 Create and manage offers |
+| 📅 Reservation requests | 🍽️ Menu and table management |
+| 🚚 Dine-in, takeaway & delivery orders | 👥 Staff, customers & inventory |
+| 📱 Responsive interface | 📈 Expense and sales reports |
 
 ## 🎨 Design & Experience
 
-- **Visual identity:** deep forest green, warm gold and soft ivory, with rich food photography.
-- **Modern layout:** prominent hero section, featured dishes, elegant offer cards and clean typography.
-- **Subtle motion:** smooth page scrolling and hover transitions on navigation, buttons and cards.
-- **Interactive UI:** menu search, category filtering and a collapsible mobile navigation.
-- **Two connected experiences:** a customer storefront inspired by **Spice Haven** and an admin interface using **TailwindAdmin** assets.
+- **Style:** Forest green, gold and ivory with food photography.
+- **Layout:** Elegant hero section, food cards, offers and responsive navigation.
+- **Motion:** Smooth scrolling, hover transitions and animated README showcases.
+- **Interactions:** Live menu search, category filtering and mobile navigation.
+- **Templates:** Customer pages adapted from **Spice Haven**; admin pages adapted from **TailwindAdmin**.
 
 ## 🛠️ Languages & Technologies
 
-| Layer | Technology |
+| Layer | Technologies |
 | --- | --- |
 | **Backend** | Python · Flask · Flask-SQLAlchemy |
 | **Frontend** | HTML5 · CSS3 · JavaScript · Jinja2 |
 | **Database** | MySQL / MariaDB · XAMPP · PyMySQL |
 | **Authentication & Forms** | Flask-Login · Flask-WTF |
-| **UI foundation** | Spice Haven · TailwindAdmin (adapted templates) |
+| **Interface** | Spice Haven · TailwindAdmin (adapted) |
 
-## 🔗 Application Pages
+## 📱 Application Pages
 
-`Home` · `Menu` · `Offers` · `Cart` · `Checkout` · `Reservations` · `Admin Dashboard` · `POS`
+*Animated previews of the project templates using fictional sample data.*
+
+### 🍽️ Customer Experience
+
+`Home` · `Menu & Search` · `Reservations`
+
+![Animated customer homepage, menu filtering and reservations](docs/feature-customer-pages.gif)
+
+### 🏷️ Offers & Online Ordering
+
+`Special Offers` · `Shopping Cart` · `Promo Codes` · `Checkout`
+
+![Animated offers, cart and checkout features](docs/feature-offers-checkout.gif)
+
+### 📊 Admin Dashboard & POS
+
+`Overview` · `Offer Management` · `Point of Sale`
+
+![Animated admin dashboard, offers management and POS](docs/feature-admin-dashboard.gif)
 
 ---
 
-<div align="center">
-
-**The Royal Spice** · Version 2.0
-
-<sub>Built as a local development MVP with fictional restaurant sample data. Not yet production-ready.</sub>
-
-</div>
+**The Royal Spice · Version 2.0**  
+*Local development MVP with fictional restaurant data. Not yet production-ready.*
