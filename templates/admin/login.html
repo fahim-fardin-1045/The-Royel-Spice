@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin Login · The Royal Spice</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/tailwindadmin.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/dashboard.css') }}"></head>
+<body style="min-height:100vh;display:grid;place-items:center;background:#f2f6fc;padding:16px">
+<div class="panel" style="max-width:430px;width:100%;padding:35px">
+ <div class="admin-brand" style="padding:0 0 25px"><img src="{{ url_for('static', filename='admin/images/logos/logoIcon.svg') }}" width="40" alt=""><div><strong>THE ROYAL SPICE</strong><small>STAFF PORTAL</small></div></div>
+ <h1 style="font-size:24px;margin-bottom:10px;font-weight:800">Administrator Sign In</h1><p style="margin-bottom:25px">Sign in with the account created from the terminal.</p>
+ {% with messages=get_flashed_messages(with_categories=true) %}{% for cat,msg in messages %}<div class="alert alert-{{ cat }}">{{ msg }}</div>{% endfor %}{% endwith %}
+ <form method="post" class="grid-form" style="grid-template-columns:1fr">
+ <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+ <label>Username<input name="username" required autocomplete="username"></label>
+ <label>Password<input name="password" type="password" required autocomplete="current-password"></label>
+ <button class="primary-btn" style="padding:14px" type="submit">SIGN IN</button>
+ </form><a style="display:block;margin-top:20px;color:#4e46ca" href="{{ url_for('home') }}">← Back to website</a>
+</div></body></html>

@@ -1,0 +1,20 @@
+{% extends 'admin/base.html' %}
+{% block title %}Menu{% endblock %}{% block breadcrumb %}Menu{% endblock %}{% block heading %}Food Menu{% endblock %}
+{% block intro %}Add dishes, change prices and control online availability.{% endblock %}
+{% block content %}
+<div class="panel"><h2>Add or Edit Dish</h2><form method="post" id="menuForm" class="grid-form">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="item_id">
+<label>Item Code<input name="code" maxlength="20" placeholder="F011" required></label>
+<label>Food Name<input name="name" maxlength="120" required></label>
+<label>Category<input name="category" maxlength="80" required></label>
+<label>Price (BDT)<input type="number" min="0.01" step="0.01" name="price" required></label>
+<label class="wide">Description<input name="description" maxlength="255"></label>
+<label class="checkbox-label"><input type="checkbox" name="available" checked> Available online</label>
+<div class="actions"><button class="primary-btn" type="submit">SAVE FOOD</button><button class="secondary-btn" type="reset" onclick="this.form.elements.namedItem('item_id').value=''">CLEAR</button></div>
+</form></div>
+<div class="panel"><h2>Menu Items ({{ items|length }})</h2><div class="table-wrap"><table class="admin-table"><thead><tr><th>Code</th><th>Dish</th><th>Category</th><th>Price</th><th>Availability</th><th>Actions</th></tr></thead><tbody>
+{% for i in items %}<tr><td>{{ i.code }}</td><td>{{ i.name }}</td><td>{{ i.category }}</td><td>{{ i.price|bdt }}</td><td><span class="status {{ 'completed' if i.available else 'cancelled' }}">{{ 'Available' if i.available else 'Hidden' }}</span></td>
+<td><button type="button" class="secondary-btn small-btn" data-values='{{ {'item_id': i.id, 'code': i.code, 'name': i.name, 'category': i.category, 'price': i.price|string, 'description': i.description, 'available': i.available}|tojson }}' onclick="fillForm('menuForm',this)">EDIT</button>
+<form method="post" class="inline-form" action="{{ url_for('admin_menu_delete',item_id=i.id) }}" onsubmit="return confirm('Delete this item or hide it if previously ordered?')"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="danger-btn small-btn" type="submit">DELETE</button></form></td></tr>
+{% else %}<tr><td class="empty" colspan="6">No menu items.</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

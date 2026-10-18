@@ -1,0 +1,26 @@
+{% extends 'admin/base.html' %}
+{% block title %}Promotional Offers{% endblock %}{% block breadcrumb %}Offers{% endblock %}{% block heading %}Offers & Promotions{% endblock %}
+{% block intro %}Create discount codes, set minimum order amounts and schedule offers. Discounts are verified at checkout.{% endblock %}
+{% block content %}
+<div class="panel"><h2>Create or edit an offer</h2><p class="muted">Offers are visible on the customer website when enabled and within their valid dates. All amounts use BDT.</p>
+<form method="post" id="offerForm" class="grid-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="offer_id">
+<label>Promotion code<input name="code" maxlength="30" placeholder="WELCOME10" required></label>
+<label>Offer title<input name="title" maxlength="120" placeholder="Enjoy 10% off" required></label>
+<label class="wide">Short description<input name="description" maxlength="255" placeholder="A welcome treat for our guests"></label>
+<label>Discount type<select name="discount_type" required><option value="percent">Percentage (%)</option><option value="fixed">Fixed amount (৳)</option></select></label>
+<label>Discount value<input type="number" min="0.01" max="99999999" step="0.01" name="discount_value" required placeholder="10"></label>
+<label>Minimum order (৳)<input type="number" min="0" max="99999999" step="0.01" name="min_order" value="0" required></label>
+<label>Max discount (৳, percent only)<input type="number" min="0.01" step="0.01" name="max_discount" placeholder="Optional cap"></label>
+<label>Starts at (optional)<input type="datetime-local" name="starts_at"></label>
+<label>Expires at (optional)<input type="datetime-local" name="ends_at"></label>
+<label>Usage limit (optional)<input type="number" min="1" name="max_uses" placeholder="Unlimited"></label>
+<label class="checkbox-label"><input type="checkbox" name="active" checked> Enabled</label>
+<label class="checkbox-label"><input type="checkbox" name="featured" checked> Show on home page</label>
+<div class="actions wide"><button class="primary-btn" type="submit">SAVE OFFER</button><button type="reset" class="secondary-btn" onclick="this.form.elements.namedItem('offer_id').value=''">CLEAR</button></div>
+</form></div>
+<div class="panel"><h2>All offers ({{ entries|length }})</h2><div class="table-wrap"><table class="admin-table"><thead><tr><th>Code & name</th><th>Discount</th><th>Minimum</th><th>Redemptions</th><th>Visibility</th><th>Actions</th></tr></thead><tbody>
+{% for o in entries %}<tr><td><strong>{{ o.code }}</strong><br><span class="muted">{{ o.title }}</span></td><td>{{ o.display_amount }}</td><td>{{ o.min_order|bdt }}</td><td>{{ counts[o.id] }} / {{ o.max_uses or '∞' }}</td><td><span class="status {{ 'completed' if o.active else 'cancelled' }}">{{ 'Enabled' if o.active else 'Disabled' }}</span></td><td>
+<button type="button" class="secondary-btn small-btn" data-values='{{ {'offer_id':o.id, 'code':o.code,'title':o.title,'description':o.description,'discount_type':o.discount_type,'discount_value':o.discount_value|string,'min_order':o.min_order|string,'max_discount':(o.max_discount|string if o.max_discount is not none else ''),'starts_at':(o.starts_at.strftime('%Y-%m-%dT%H:%M') if o.starts_at else ''),'ends_at':(o.ends_at.strftime('%Y-%m-%dT%H:%M') if o.ends_at else ''),'max_uses':(o.max_uses|string if o.max_uses else ''),'active':o.active,'featured':o.featured}|tojson }}' onclick="fillForm('offerForm',this)">EDIT</button>
+<form class="inline-form" method="post" action="{{ url_for('admin_offer_toggle',offer_id=o.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="small-btn {{ 'danger-btn' if o.active else 'primary-btn' }}" type="submit">{{ 'DISABLE' if o.active else 'ENABLE' }}</button></form>
+</td></tr>{% else %}<tr><td colspan="6" class="empty">No offers created yet.</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

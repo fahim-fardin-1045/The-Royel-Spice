@@ -1,0 +1,30 @@
+
+/* Additions to the user-supplied Spice Haven frontend. */
+.site-alerts{position:fixed;top:118px;right:16px;z-index:2200;width:min(370px,calc(100vw - 32px));display:grid;gap:8px}
+.site-alert{background:#f9f8ed;color:#282d18;padding:13px 17px;border:1px solid #b6bd85;box-shadow:0 5px 20px #0002;border-radius:5px;font-size:14px}
+.site-alert.error{border-color:#b83a33;background:#fff2f0;color:#962c24}
+.menu-row.dynamic-menu-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dynamic-menu-row .dish-name{flex:1 1 130px}
+.inline-cart button{background:#222;color:#fff;border:0;padding:7px 12px;cursor:pointer;font-size:11px;letter-spacing:1px}
+.inline-cart button:hover{background:#6d7343}
+.booking-live,.site-content{max-width:1100px;margin:0 auto;padding:48px 24px 100px;min-height:48vh}
+.booking-live>p{max-width:740px;margin:0 auto 25px;text-align:center;line-height:1.6}
+.live-form,.order-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;max-width:760px;margin:0 auto}
+.live-form label,.order-form label{display:grid;gap:8px;font-size:14px;font-weight:bold}
+.live-form input,.live-form select,.live-form textarea,.order-form input,.order-form select,.order-form textarea,.site-content input[type=number]{padding:12px;border:1px solid #aaa;background:#fff;border-radius:2px;width:100%;font:inherit}
+.live-form label:has(textarea),.form-note{grid-column:1/-1}
+.form-note{font-size:13px;color:#555;line-height:1.6}
+.live-form .book-btn,.order-form .book-btn{grid-column:1/-1;cursor:pointer;max-width:100%;margin-top:7px}
+.site-content h1{font-family:Georgia,serif;font-size:clamp(35px,5vw,56px);margin-bottom:25px;text-align:center}
+.site-content h2{font-family:Georgia,serif;font-size:25px;margin:32px 0 12px}
+.cart-table{width:100%;border-collapse:collapse;background:white;margin-bottom:22px}
+.cart-table th,.cart-table td{text-align:left;padding:15px;border-bottom:1px solid #ddd}
+.cart-table th{background:#daddbc}
+.site-action{display:inline-block;background:#181818;color:white;padding:13px 20px;border:0;cursor:pointer;margin:6px 6px 6px 0;font:inherit}
+.site-action.ghost{background:#73765b}
+.cart-summary{text-align:right;font-size:21px;margin:20px 0}
+.checkout-box{max-width:860px;margin:auto}
+.receipt-box{background:#fff;padding:25px;margin:25px auto;max-width:720px;line-height:1.9}
+.receipt-box table{width:100%;border-collapse:collapse}
+.receipt-box td{padding:8px;border-bottom:1px solid #eee}
+@media(max-width:680px){.live-form,.order-form{grid-template-columns:1fr}.live-form label:has(textarea),.form-note{grid-column:auto}.cart-table th,.cart-table td{padding:8px;font-size:12px}}

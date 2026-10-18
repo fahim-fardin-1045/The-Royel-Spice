@@ -1,0 +1,16 @@
+{% extends 'admin/base.html' %}
+{% block title %}Settings{% endblock %}{% block breadcrumb %}Settings{% endblock %}{% block heading %}Restaurant Settings{% endblock %}
+{% block intro %}Change the restaurant information shown across the customer website.{% endblock %}
+{% block content %}
+<div class="panel"><h2>Business Profile · {{ restaurant.restaurant_id }}</h2><form method="post" class="grid-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label>Restaurant Name<input name="name" value="{{ restaurant.name }}" required maxlength="120"></label>
+<label>Business Type<input name="subtitle" value="{{ restaurant.subtitle }}" required maxlength="120"></label>
+<label>Owner Name<input name="owner_name" value="{{ restaurant.owner_name }}" required maxlength="100"></label>
+<label class="wide">Address<input name="address" value="{{ restaurant.address }}" required maxlength="255"></label>
+<label>Phone<input name="phone" value="{{ restaurant.phone }}" required maxlength="40"></label>
+<label>Email<input name="email" type="email" value="{{ restaurant.email }}" required maxlength="120"></label>
+<label>Opening Time<input type="time" name="opening_time" value="{{ restaurant.opening_time.strftime('%H:%M') }}" required></label>
+<label>Closing Time<input type="time" name="closing_time" value="{{ restaurant.closing_time.strftime('%H:%M') }}" required></label>
+<label>Maximum Seating Capacity<input type="number" name="seating_capacity" value="{{ restaurant.seating_capacity }}" min="1" max="1000" required></label>
+<div class="actions"><button class="primary-btn">SAVE SETTINGS</button></div></form></div>
+{% endblock %}

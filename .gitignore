@@ -1,0 +1,32 @@
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+venv/
+.venv/
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Runtime files
+instance/
+*.sqlite
+*.sqlite3
+*.db
+*.log
+
+# Dependencies
+node_modules/
+
+# macOS and editors
+.DS_Store
+.vscode/
+.idea/
+
+# Local backup
+app_backup.py

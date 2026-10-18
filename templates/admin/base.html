@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en" dir="ltr" data-color-theme="Blue_Theme" class="light selected" data-layout="vertical" data-boxed-layout="boxed">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+ <title>{% block title %}Admin{% endblock %} · {{ restaurant.name }}</title>
+ <link rel="stylesheet" href="{{ url_for('static', filename='admin/tailwindadmin.css') }}">
+ <link rel="stylesheet" href="{{ url_for('static', filename='admin/dashboard.css') }}">
+ <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-white">
+ <div class="admin-layout">
+  <aside class="admin-sidebar" id="sidebar">
+    <div class="admin-brand"><img src="{{ url_for('static', filename='admin/images/logos/logoIcon.svg') }}" alt="" width="34" height="34"><div><strong>ROYAL SPICE</strong><small>MANAGEMENT</small></div></div>
+    <div class="nav-caption">OPERATIONS</div>
+    <nav aria-label="Admin navigation">
+      {% for endpoint, name, icon in [
+       ('admin_dashboard','Dashboard','▦'),('admin_pos','New POS Sale','▣'),('admin_orders','Orders & Billing','▤'),
+       ('admin_menu','Food Menu','☷'),('admin_offers','Offers & Promotions','✦'),('admin_reservations','Reservations','▦'),
+       ('admin_tables','Dining Tables','▣'),('admin_customers','Customers','♙'),
+       ('admin_inventory','Inventory','▧'),('admin_employees','Employees','♙'),
+       ('admin_expenses','Expenses','৳'),('admin_reports','Reports','▥'),('admin_settings','Settings','⚙') ] %}
+      <a href="{{ url_for(endpoint) }}" class="nav-item {% if request.endpoint == endpoint %}chosen{% endif %}"><span class="nav-icon">{{ icon }}</span>{{ name }}</a>
+      {% endfor %}
+    </nav>
+    <div class="sidebar-bottom"><span>REST-001 · Sample restaurant</span><a href="{{ url_for('home') }}" target="_blank" rel="noopener">View customer website ↗</a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <button class="mobile-toggle" id="adminToggle" type="button" aria-label="Toggle sidebar">☰</button>
+      <div><strong>{{ restaurant.name }}</strong><span class="muted"> / {% block breadcrumb %}Dashboard{% endblock %}</span></div>
+      <div class="user-area"><img src="{{ url_for('static', filename='admin/images/profile/user-1.jpg') }}" alt="" width="34" height="34"><span>{{ current_user.username }}</span>
+        <form method="post" action="{{ url_for('admin_logout') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="link-button" type="submit">Log out</button></form></div>
+    </header>
+    <main class="admin-container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<div class="alerts" role="status">{% for cat,msg in messages %}<div class="alert alert-{{ cat }}">{{ msg }}</div>{% endfor %}</div>{% endif %}
+      {% endwith %}
+      <div class="heading-row"><div><h1>{% block heading %}Dashboard{% endblock %}</h1><p>{% block intro %}Manage your restaurant in one place.{% endblock %}</p></div>{% block headingaction %}{% endblock %}</div>
+      {% block content %}{% endblock %}
+      <footer class="admin-footer">The Royal Spice · Built with the supplied TailwindAdmin assets · Fictional sample data</footer>
+    </main>
+  </div>
+ </div>
+ <script>
+ const toggle=document.getElementById('adminToggle');toggle?.addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('mobile-open'));
+ function fillForm(formId,button){const form=document.getElementById(formId);const fields=JSON.parse(button.dataset.values);for(const [name,value] of Object.entries(fields)){const input=form.elements.namedItem(name);if(!input)continue;if(input.type==='checkbox')input.checked=!!value;else input.value=value??'';}form.scrollIntoView({behavior:'smooth',block:'center'});}
+ </script>
+ {% block scripts %}{% endblock %}
+</body></html>

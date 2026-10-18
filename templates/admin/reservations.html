@@ -1,0 +1,9 @@
+{% extends 'admin/base.html' %}
+{% block title %}Reservations{% endblock %}{% block breadcrumb %}Reservations{% endblock %}{% block heading %}Reservations{% endblock %}
+{% block intro %}Confirm or cancel table requests. Reservation times are Dhaka local time.{% endblock %}
+{% block content %}
+<div class="panel"><h2>Bookings</h2><div class="table-wrap"><table class="admin-table"><thead><tr><th>Booking</th><th>Guest</th><th>Party</th><th>Date / Time</th><th>Notes</th><th>Status</th></tr></thead><tbody>
+{% for b in bookings %}<tr><td>#{{ b.id }}</td><td>{{ b.guest_name }}<br>{{ b.phone }}</td><td>{{ b.party_size }}</td><td>{{ b.starts_at.strftime('%d %b %Y, %I:%M %p') }}</td><td>{{ b.notes or '—' }}</td>
+<td><form method="post" class="inline-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="id" value="{{ b.id }}"><select name="status">{% for state in reservation_states %}<option value="{{ state }}" {% if state==b.status %}selected{% endif %}>{{ state|title }}</option>{% endfor %}</select><button class="primary-btn small-btn">SAVE</button></form></td></tr>
+{% else %}<tr><td class="empty" colspan="6">No reservations yet.</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

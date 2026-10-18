@@ -1,0 +1,26 @@
+{% extends 'admin/base.html' %}
+{% block title %}Point of Sale{% endblock %}{% block breadcrumb %}POS{% endblock %}{% block heading %}New POS Sale{% endblock %}
+{% block intro %}Create a dine-in or takeaway bill from the staff terminal.{% endblock %}
+{% block content %}
+<div class="panel"><h2>Walk-in Sale</h2>
+<form method="post" id="posForm" class="grid-form">
+ <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+ <label>Customer Name<input name="name" maxlength="100" value="Walk-in Guest" required></label>
+ <label>Customer Phone / Ref<input name="phone" maxlength="40" placeholder="Phone or unique POS reference" required></label>
+ <label>Service <select name="service_type"><option value="dine-in">Dine-in</option><option value="takeaway">Takeaway</option></select></label>
+ <label>Table (if dine-in)<select name="table_number"><option value="">Select table</option>{% for t in tables %}<option value="{{ t.number }}">{{ t.number }}</option>{% endfor %}</select></label>
+ <label>Payment Method<select name="payment_method">{% for method in payment_methods %}<option value="{{ method }}">{{ method }}</option>{% endfor %}</select></label>
+ <label>Offer code (optional)<input name="offer_code" maxlength="30" placeholder="WELCOME10"></label>
+ <div class="wide" id="posRows"><strong style="display:block;margin-bottom:10px">Food Items</strong>
+  <div class="pos-line" style="display:flex;gap:10px;margin-bottom:10px"><select name="menu_item_id" style="flex:1;min-width:0;padding:11px;border:1px solid #dae1ed;border-radius:7px">{% for i in menu_items %}<option value="{{ i.id }}">{{ i.name }} — {{ i.price|bdt }}</option>{% endfor %}</select><input type="number" name="quantity" value="1" min="1" max="20" required style="width:90px;padding:11px;border:1px solid #dae1ed;border-radius:7px"></div>
+ </div>
+ <div class="actions"><button type="button" class="secondary-btn" id="addPosLine">+ ADD ANOTHER FOOD</button></div>
+ <label class="checkbox-label"><input type="checkbox" name="paid"> Payment received</label>
+ <label class="checkbox-label"><input type="checkbox" name="completed"> Complete order immediately</label>
+ <div class="actions"><button type="submit" class="primary-btn">CREATE BILL</button></div>
+</form></div>
+<p>Delivery orders should be placed through the customer checkout, which collects a delivery address. This POS records payments manually; it does not integrate a payment gateway.</p>
+{% endblock %}
+{% block scripts %}<script>
+document.getElementById('addPosLine').addEventListener('click',()=>{let panel=document.getElementById('posRows');if(panel.querySelectorAll('.pos-line').length>=20)return;const row=panel.querySelector('.pos-line').cloneNode(true);row.querySelector('input').value='1';panel.appendChild(row)});
+</script>{% endblock %}

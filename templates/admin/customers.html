@@ -1,0 +1,6 @@
+{% extends 'admin/base.html' %}
+{% block title %}Customers{% endblock %}{% block breadcrumb %}Customers{% endblock %}{% block heading %}Customers{% endblock %}
+{% block intro %}Contact details are created automatically when customers place orders.{% endblock %}
+{% block content %}
+<div class="panel"><h2>Customer List</h2><div class="table-wrap"><table class="admin-table"><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Orders</th><th>First Order</th></tr></thead><tbody>{% for c in customers %}<tr><td>{{ c.name }}</td><td>{{ c.phone }}</td><td>{{ c.email or '—' }}</td><td>{{ c.orders|length }}</td><td>{{ c.created_at.strftime('%d %b %Y') }}</td></tr>{% else %}<tr><td colspan="5" class="empty">No customers yet.</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

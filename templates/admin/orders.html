@@ -1,0 +1,11 @@
+{% extends 'admin/base.html' %}
+{% block title %}Orders{% endblock %}{% block breadcrumb %}Orders{% endblock %}{% block heading %}Orders & Billing{% endblock %}
+{% block intro %}Process incoming orders and record offline payment collection.{% endblock %}
+{% block content %}
+<div class="panel"><h2>Latest Orders</h2><div class="table-wrap"><table class="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Items</th><th>Type</th><th>Total</th><th>Method</th><th>Payment</th><th>Stage</th></tr></thead><tbody>
+{% for o in orders %}<tr><td>#{{ o.id }}<br><small>{{ o.created_at.strftime('%d %b %H:%M') }}</small></td><td>{{ o.customer.name }}<br>{{ o.customer.phone }}{% if o.address %}<br><small>{{ o.address }}</small>{% endif %}</td>
+<td>{% for i in o.items %}{{ i.quantity }}× {{ i.name }}<br>{% endfor %}</td><td>{{ o.service_type|title }}{% if o.table_number %}<br>{{ o.table_number }}{% endif %}</td><td>{{ o.total|bdt }}</td><td>{{ o.payment_method }}</td>
+<td><span class="status {{ o.payment_status }}">{{ o.payment_status }}</span><br><form method="post" action="{{ url_for('admin_order_paid',order_id=o.id) }}" class="inline-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="paid" value="{{ 'no' if o.payment_status=='paid' else 'yes' }}"><button class="secondary-btn small-btn">{{ 'UNDO PAID' if o.payment_status=='paid' else 'MARK PAID' }}</button></form></td>
+<td><form method="post" action="{{ url_for('admin_order_status',order_id=o.id) }}" class="inline-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><select name="status">{% for status in order_states %}<option value="{{ status }}" {% if o.status==status %}selected{% endif %}>{{ status|title }}</option>{% endfor %}</select><button class="primary-btn small-btn">SAVE</button></form></td></tr>
+{% else %}<tr><td class="empty" colspan="8">No orders found. Place one from the customer menu to test.</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

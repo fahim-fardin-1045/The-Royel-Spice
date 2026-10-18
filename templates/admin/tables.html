@@ -1,0 +1,9 @@
+{% extends 'admin/base.html' %}
+{% block title %}Tables{% endblock %}{% block breadcrumb %}Tables{% endblock %}{% block heading %}Dining Tables{% endblock %}
+{% block intro %}Maintain the seating layout used in capacity checks.{% endblock %}
+{% block content %}
+<div class="panel"><h2>Add or Edit Table</h2><form method="post" id="tableForm" class="grid-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="item_id">
+<label>Table Number<input name="number" maxlength="20" placeholder="T21" required></label><label>Seats<input type="number" min="1" max="30" name="seats" value="4" required></label><label class="checkbox-label"><input name="active" type="checkbox" checked> Active</label>
+<div class="actions"><button class="primary-btn">SAVE TABLE</button><button class="secondary-btn" type="reset" onclick="this.form.elements.namedItem('item_id').value=''">CLEAR</button></div></form></div>
+<div class="panel"><h2>All Tables</h2><div class="table-wrap"><table class="admin-table"><thead><tr><th>Number</th><th>Seats</th><th>Status</th><th></th></tr></thead><tbody>{% for t in tables %}<tr><td>{{ t.number }}</td><td>{{ t.seats }}</td><td><span class="status {{ 'completed' if t.active else 'cancelled' }}">{{ 'Active' if t.active else 'Inactive' }}</span></td><td><button class="secondary-btn small-btn" data-values='{{ {'item_id':t.id,'number':t.number,'seats':t.seats,'active':t.active}|tojson }}' onclick="fillForm('tableForm',this)">EDIT</button></td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

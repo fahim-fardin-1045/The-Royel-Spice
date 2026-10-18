@@ -1,0 +1,8 @@
+{% extends 'admin/base.html' %}
+{% block title %}Reports{% endblock %}{% block breadcrumb %}Reports{% endblock %}{% block heading %}Sales & Reports{% endblock %}
+{% block intro %}Totals use completed orders and manually recorded expenses only.{% endblock %}
+{% block content %}
+<div class="stats"><div class="stat green"><span>Completed Sales</span><strong>{{ all_sales|bdt }}</strong></div><div class="stat orange"><span>Recorded Expenses</span><strong>{{ all_expenses|bdt }}</strong></div><div class="stat blue"><span>Completed Orders</span><strong>{{ completed }}</strong></div><div class="stat violet"><span>Sales Less Expenses*</span><strong>{{ (all_sales-all_expenses)|bdt }}</strong></div></div>
+<div class="panel"><h2>Sales by Service Type</h2><div class="table-wrap"><table class="admin-table"><thead><tr><th>Type</th><th>Orders</th><th>Completed Sales</th></tr></thead><tbody>{% for service,qty,amount in breakdown %}<tr><td>{{ service|title }}</td><td>{{ qty }}</td><td>{{ amount|bdt }}</td></tr>{% else %}<tr><td colspan="3" class="empty">Complete an order to populate this report.</td></tr>{% endfor %}</tbody></table></div>
+<p style="font-size:12px;margin-top:18px">* This is a simple cash-style difference, <strong>not accounting profit</strong>. It excludes cost of goods sold, tax, payroll expenses not entered, and unpaid receivables.</p></div>
+{% endblock %}

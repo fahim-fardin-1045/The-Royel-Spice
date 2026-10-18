@@ -1,0 +1,21 @@
+{% extends 'admin/base.html' %}
+{% block heading %}Restaurant Overview{% endblock %}
+{% block intro %}Live operational metrics from your MySQL database.{% endblock %}
+{% block content %}
+<div class="panel" style="background:#eaf0ff;display:flex;justify-content:space-between;align-items:center;overflow:hidden">
+ <div><h2 style="font-size:23px;margin-bottom:8px">Welcome back, {{ current_user.username }} 👋</h2><p style="margin:0">Here's what's happening at {{ restaurant.name }} today.</p></div>
+ <img src="{{ url_for('static', filename='admin/images/background/customer-support-img.png') }}" alt="" width="130">
+</div>
+<div class="stats">
+ <div class="stat blue"><span>Today's Orders</span><strong>{{ daily_orders }}</strong></div>
+ <div class="stat green"><span>Today's Completed Sales</span><strong>{{ sales|bdt }}</strong></div>
+ <div class="stat violet"><span>Pending Reservations</span><strong>{{ open_bookings }}</strong></div>
+ <div class="stat orange"><span>Today's Expenses</span><strong>{{ expenses|bdt }}</strong></div>
+</div>
+<div class="panel"><h2>Recent Orders</h2><div class="table-wrap"><table class="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Service</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead><tbody>
+{% for o in recent %}<tr><td>#{{ o.id }}</td><td>{{ o.customer.name }}</td><td>{{ o.service_type|title }}</td><td>{{ o.total|bdt }}</td><td><span class="status {{ o.payment_status }}">{{ o.payment_status }}</span></td><td><span class="status {{ o.status }}">{{ o.status }}</span></td></tr>
+{% else %}<tr><td colspan="6" class="empty">No orders recorded yet.</td></tr>{% endfor %}
+</tbody></table></div></div>
+<div class="panel" style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap"><div><h2>✦ Promotions</h2><p>Manage discount codes, special offers, dates and usage limits.</p></div><a class="primary-btn" href="{{ url_for('admin_offers') }}">MANAGE OFFERS →</a></div>
+<div class="panel"><strong>{{ low_stock }}</strong> inventory items are at or below their reorder level. <a href="{{ url_for('admin_inventory') }}" style="color:#4e46c9">Review inventory →</a></div>
+{% endblock %}
