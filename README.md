@@ -1,175 +1,456 @@
-# Version 2: redesigned website + promotional offers
+# The Royal Spice
 
-See **`UPGRADE_GUIDE_MAC.md`** for safe steps to upgrade your existing Mac/XAMPP install. The admin now supports offer/coupon management and the public pages have a redesigned layout. Run `flask --app app init-db` to add **two new tables without deleting your data**, then `flask --app app seed` for two optional demo offers. MySQL remains on **3307**, Flask recommended on **5055** on macOS.
+### Restaurant Website & Management System · Version 2.0
+
+A database-driven restaurant website and management dashboard built with **Python, Flask, SQLAlchemy, and MySQL/MariaDB via XAMPP**. The customer-facing experience is adapted from the provided **Spice Haven** template; the administration interface uses the supplied **TailwindAdmin** assets.
+
+> **Project status:** Development MVP for local use, demonstration, and further development. This release is **not production-ready**. All restaurant identities, addresses, menu entries, staff, and promotions supplied as seed data are fictional.
+
+**Stack:** Python 3.11+ · Flask 3.1+ · Flask-SQLAlchemy · Flask-Login · Flask-WTF · PyMySQL · MySQL/MariaDB · HTML/CSS/JavaScript
+
+**Local development:** Flask on `127.0.0.1:5055` · XAMPP MySQL on `127.0.0.1:3307` · Database `royal_spice`
 
 ---
 
-# The Royal Spice — Dynamic Restaurant Website + Admin Panel
+## Table of Contents
 
-A **Flask / SQLAlchemy** restaurant-management starter connected to **XAMPP MySQL / MariaDB**. The customer website adapts the supplied **Spice Haven** HTML/CSS/photos. The staff area adapts the supplied **TailwindAdmin** compiled CSS and imagery. Both interfaces use the same database.
+1. [Overview](#1-overview)
+2. [Features](#2-features)
+3. [System Architecture](#3-system-architecture)
+4. [Prerequisites](#4-prerequisites)
+5. [Installation — macOS with XAMPP](#5-installation--macos-with-xampp)
+6. [Installation — Windows with XAMPP](#6-installation--windows-with-xampp)
+7. [Upgrading an Existing Version 1 Installation](#7-upgrading-an-existing-version-1-installation)
+8. [Configuration](#8-configuration)
+9. [Using the Application](#9-using-the-application)
+10. [Offers & Promotions](#10-offers--promotions)
+11. [Project Structure](#11-project-structure)
+12. [Database and Data Management](#12-database-and-data-management)
+13. [Testing](#13-testing)
+14. [Troubleshooting](#14-troubleshooting)
+15. [Security and Known Limitations](#15-security-and-known-limitations)
+16. [Credits and Licences](#16-credits-and-licences)
 
-**Demo business:** The Royal Spice, REST-001, Dhanmondi, Dhaka. The document's 10 foods, 5 staff members, 20 tables (4 seats each), 80 seats, opening hours (10:00–23:00), and BDT currency are used. This data is **fictional**.
+---
 
-## Mac / XAMPP setup (MySQL on port 3307)
+## 1. Overview
 
-This project is configured for the XAMPP MySQL server on **port 3307**. Its `app.py` automatically updates **local MySQL URLs** using port `3306` (including those already saved in `.env`) to port `3307`; it does **not** change the XAMPP MySQL service or rewrite `.env`. Other database URLs (such as SQLite used by tests) are left unchanged. MySQL must be running, the database `royal_spice` must exist, and the username/password must be correct.
+**The Royal Spice** brings together a public food-ordering website, a point-of-sale workflow, restaurant administration, and an integrated promotional-offers system. The frontend and admin panel read and write data through a single Flask application and relational database.
 
-From the extracted `royal_spice` folder:
+The sample configuration represents a restaurant in Dhanmondi, Dhaka, Bangladesh:
 
-```sh
-python3 -m venv venv
-source venv/bin/activate
-python -m pip install -r requirements.txt
-cp .env.example .env
+| Property | Seeded value |
+| --- | --- |
+| Restaurant | The Royal Spice — Restaurant & Café |
+| Restaurant ID | `REST-001` |
+| Location | Dhanmondi, Dhaka-1209, Bangladesh |
+| Opening hours | 10:00 AM–11:00 PM |
+| Currency | Bangladeshi Taka (BDT / ৳) |
+| Dining tables | 20 tables, initially 4 seats each |
+| Seating capacity | 80 guests |
+| Seeded menu | 10 food and drink items |
+| Seeded staff | 5 employees |
+| Services | Dine-in, takeaway, delivery |
+| Recorded payment options | Cash, Card, bKash, Nagad |
+
+The details above are sample data. Update the restaurant profile in **Admin → Settings** before using the project for an actual restaurant.
+
+## 2. Features
+
+### Customer website
+
+- Redesigned, responsive homepage with food highlights and featured promotions.
+- Database-driven food menu with category filters and client-side search.
+- Shopping cart with quantity adjustments and live order totals.
+- Checkout for **dine-in**, **takeaway**, and **delivery**.
+- Optional coupon code applied to eligible orders.
+- Order confirmation and a private-token receipt link.
+- Online reservation-request form with server-side aggregate capacity checks.
+- About page and dedicated **Special Offers** page.
+
+### Administration dashboard
+
+- Administrator sign-in and sign-out.
+- Overview dashboard with daily orders, completed sales, pending reservations, and stock alerts.
+- Menu management: create, edit, unpublish, and delete eligible entries.
+- Order management: progress statuses and manually recorded payment statuses.
+- Staff-entered POS for dine-in or takeaway orders, including discount codes.
+- **Offers & Promotions:** create, edit, enable, disable, feature, and schedule offers.
+- Reservation management, dining-table management, and customer records.
+- Employee records, basic inventory, expenses, and summary reports.
+- Restaurant profile and operating-hours settings.
+
+## 3. System Architecture
+
+```text
+Customer browser                      Staff / admin browser
+        |                                      |
+        +----------------+---------------------+
+                         |
+                    Flask application
+                  (routes + templates)
+                         |
+              Flask-SQLAlchemy / PyMySQL
+                         |
+                 XAMPP MySQL / MariaDB
+                  database: royal_spice
 ```
 
-Edit `.env` to insert your actual MySQL password, if any, and a randomly generated `SECRET_KEY`. Create the database using phpMyAdmin or run `db_setup.sql`. Then execute:
+Flask serves the website directly during development. **XAMPP supplies the database server**; Apache is only needed if you want to access phpMyAdmin. You do not need to run the Flask website through Apache or browse to an `htdocs` URL.
 
-```sh
+## 4. Prerequisites
+
+- **Python 3.11 or newer** with `venv` and `pip` (the project has been used with Python 3.13 on macOS).
+- **XAMPP** with MySQL/MariaDB running.
+- A supported terminal: **macOS Terminal (zsh)**, PowerShell, or Command Prompt.
+- A code editor such as VS Code (recommended).
+- The extracted project files and a database user with permission to create tables.
+
+> **Port configuration:** The supplied application is tailored to your local XAMPP MySQL service on **3307**. For local MySQL URLs specifying `3306` or no port, `app.py` redirects the application connection to `3307`. It **does not modify XAMPP or your `.env` file**. Use a different code configuration if your installation genuinely requires a different MySQL port.
+
+## 5. Installation — macOS with XAMPP
+
+These steps target your current local development setup.
+
+### 5.1 Open the project directory
+
+Extract the **Complete Project ZIP** (for a new installation) and open Terminal:
+
+```bash
+cd /Applications/XAMPP/xamppfiles/htdocs/royal_spice
+```
+
+If you extracted the project elsewhere, use that actual folder path instead.
+
+### 5.2 Create and activate a virtual environment
+
+```bash
+python3 --version
+python3 -m venv venv
+source venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+You should see `(venv)` in the Terminal prompt. **Do not** use `--break-system-packages` or install these dependencies into Homebrew's system-managed Python installation.
+
+### 5.3 Start and verify XAMPP MySQL
+
+Open **XAMPP Manager → Manage Servers → MySQL Database → Start**. Then check the database port:
+
+```bash
+nc -vz 127.0.0.1 3307
+```
+
+If necessary, identify MySQL's listening port:
+
+```bash
+sudo lsof -nP -iTCP -sTCP:LISTEN | grep -Ei 'mysql|maria'
+```
+
+### 5.4 Create the database
+
+In phpMyAdmin (`http://localhost/phpmyadmin`), open the **SQL** tab and run:
+
+```sql
+CREATE DATABASE IF NOT EXISTS royal_spice
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+```
+
+The identical SQL is included in `db_setup.sql`. If phpMyAdmin is unavailable, start XAMPP Apache or use the MySQL command-line client.
+
+### 5.5 Configure the Flask environment
+
+For a **fresh installation only**, create your local `.env` file:
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+For a common local XAMPP setup **with a blank MySQL root password**, use:
+
+```dotenv
+DATABASE_URL=mysql+pymysql://root:@127.0.0.1:3307/royal_spice?charset=utf8mb4
+APP_ENV=development
+COOKIE_SECURE=0
+SECRET_KEY=PASTE_YOUR_GENERATED_SECRET_HERE
+```
+
+If your database user has a password, insert the **actual** password into the URL instead. Generate a stable secret:
+
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Paste the generated value after `SECRET_KEY=`. Do not commit `.env` to a repository or share real credentials.
+
+### 5.6 Initialise, seed, and create an administrator
+
+Run the commands **in order**:
+
+```bash
 python -m flask --app app init-db
 python -m flask --app app seed
 python -m flask --app app create-admin
-python -m flask --app app run --debug
 ```
 
-If replacing an earlier `app.py` with this version, **keep your existing `.env` file**. A local MySQL URL that says port 3306 will be directed to 3307 automatically. If you see `Access denied`, check the existing `.env` username/password; the port fix does not change credentials.
+`create-admin` asks for a username and a password of **at least 10 characters**. The project does not contain default admin credentials.
 
-## Step-by-step installation on Windows with XAMPP
+### 5.7 Start the development server
 
-1. Install **Python 3.11+** and **XAMPP**, if not installed already.
-2. Extract this ZIP to a folder such as `C:\projects\royal_spice`.
-3. Open the **XAMPP Control Panel**. Start **MySQL**. Also start **Apache** if you want to use phpMyAdmin.
-4. In a browser, open **http://localhost/phpmyadmin**, choose the **SQL** tab and paste `db_setup.sql`:
+```bash
+python -m flask --app app run --host 127.0.0.1 --port 5055 --debug
+```
 
-   ```sql
-   CREATE DATABASE IF NOT EXISTS royal_spice
-   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   ```
+Open these URLs **on the same Mac that runs Flask**:
 
-   Press **Go**. (You only need to do this once.)
-5. Open **PowerShell** in the extracted project directory and run:
+| Page | Address |
+| --- | --- |
+| Customer homepage | <http://127.0.0.1:5055/> |
+| Dynamic menu | <http://127.0.0.1:5055/menu> |
+| Promotions | <http://127.0.0.1:5055/offers> |
+| Cart | <http://127.0.0.1:5055/cart> |
+| Reservations | <http://127.0.0.1:5055/reserve> |
+| Admin login | <http://127.0.0.1:5055/admin/login> |
+| Admin offers | <http://127.0.0.1:5055/admin/offers> |
+
+To stop Flask, press **Ctrl+C**. When returning later, reactivate the environment with `source venv/bin/activate`; you do not need to reinstall packages each time.
+
+## 6. Installation — Windows with XAMPP
+
+1. Extract the **Complete Project ZIP** into your preferred directory, for example `C:\projects\royal_spice`.
+2. Start **MySQL** in the XAMPP Control Panel; start Apache if you intend to use phpMyAdmin.
+3. Create the `royal_spice` database using the SQL in **Section 5.4**.
+4. Open **PowerShell** in the `royal_spice` directory and run:
 
    ```powershell
    py -m venv .venv
-   .\.venv\Scripts\Activate.ps1
-   python -m pip install -r requirements.txt
+   .\.venv\Scripts\python.exe -m pip install -r requirements.txt
    Copy-Item .env.example .env
    ```
 
-   If PowerShell blocks activation, use Command Prompt: `.venv\Scripts\activate.bat`, or run `.\.venv\Scripts\python.exe` instead of `python` below.
-6. Open `.env` in Notepad/VS Code. Set `DATABASE_URL` for **your MySQL password**. By default, an untouched XAMPP installation often uses MySQL user `root` with a blank password:
-
-   ```dotenv
-   DATABASE_URL=mysql+pymysql://root:@127.0.0.1:3307/royal_spice?charset=utf8mb4
-   ```
-
-   If you configured a password (or a separate database user), insert its real credentials instead. If your password contains special characters, URL-encode them (e.g., `@` → `%40`). **Using root without a password is only acceptable for isolated local development; create a limited MySQL account for deployments.**
-7. Generate a permanent random Flask session secret:
+5. Edit `.env` for your **actual** MySQL port and credentials. **Note:** this provided build assumes local MySQL on `3307`, including when a `3306` URL is supplied. Windows XAMPP frequently uses `3306`; in that case you must adapt the port-normalisation logic in `app.py` rather than only changing `.env`.
+6. Generate a `SECRET_KEY` and initialise the application without requiring PowerShell activation:
 
    ```powershell
-   python -c "import secrets; print(secrets.token_hex(32))"
+   .\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_hex(32))"
+   .\.venv\Scripts\python.exe -m flask --app app init-db
+   .\.venv\Scripts\python.exe -m flask --app app seed
+   .\.venv\Scripts\python.exe -m flask --app app create-admin
+   .\.venv\Scripts\python.exe -m flask --app app run --host 127.0.0.1 --port 5055 --debug
    ```
 
-   Paste the generated value after `SECRET_KEY=` in `.env`.
-8. Initialise the database, seed the sample menu/staff/tables and make an admin account:
+7. Open <http://127.0.0.1:5055/>. See **Section 8** for environment variables.
 
-   ```powershell
-   flask --app app init-db
-   flask --app app seed
-   flask --app app create-admin
+## 7. Upgrading an Existing Version 1 Installation
+
+**Do not perform a clean installation over your working database.** If you already have Version 1 running on your Mac, use the **Upgrade Only ZIP**.
+
+1. In phpMyAdmin, select the `royal_spice` database and **Export → SQL** to create a backup.
+2. Stop the Flask server (`Ctrl+C`).
+3. Keep your existing `.env`, `venv/`, database, and image assets.
+4. From Terminal, back up `app.py` and extract the upgrade into the directory containing `royal_spice/`:
+
+   ```bash
+   cd /Applications/XAMPP/xamppfiles/htdocs/royal_spice
+   cp app.py app_before_v2.py
+   unzip -o ~/Downloads/The_Royal_Spice_v2_Upgrade_Only.zip \
+     -d /Applications/XAMPP/xamppfiles/htdocs/
    ```
 
-   `create-admin` will prompt for a username and password (at least 10 characters); no admin account or default password is shipped in the source.
-9. Start the website:
+   If the archive has a different filename or Downloads location, substitute its actual path. The archive contains a top-level `royal_spice/` folder.
 
-   ```powershell
-   flask --app app run --debug
+5. Re-enable your existing environment and add **missing** tables:
+
+   ```bash
+   source venv/bin/activate
+   python -m flask --app app init-db
+   python -m flask --app app seed
+   python -m flask --app app run --host 127.0.0.1 --port 5055 --debug
    ```
 
-10. Visit:
+6. Verify `/offers` and `/admin/offers`, then place a test order.
 
-   - **Customer website:** http://127.0.0.1:5000/
-   - **Menu and ordering:** http://127.0.0.1:5000/menu
-   - **Reservation requests:** http://127.0.0.1:5000/reserve
-   - **Admin login:** http://127.0.0.1:5000/admin/login
-   - **POS billing:** http://127.0.0.1:5000/admin/pos
-   - **phpMyAdmin:** http://localhost/phpmyadmin
+**Data preservation:** `init-db` calls SQLAlchemy `create_all()`. For this upgrade, it creates missing tables (`offers` and `order_discounts`) and **does not intentionally drop existing tables**. It is **not a database migration tool** and does not update the structure of existing tables. `seed` adds missing sample records and demo offers; it does not overwrite existing records with matching seeded identifiers. Back up before upgrading regardless.
 
-> **XAMPP is the MySQL server, not the Python web host.** The `flask` command serves the site on port 5000, and phpMyAdmin lets you inspect the database through Apache (typically port 80).
+The bundled `UPGRADE_GUIDE_MAC.md` provides a shorter upgrade checklist.
 
-## Main features
+## 8. Configuration
 
-| Customer website | Admin interface |
+Configure application settings in the local `.env` file:
+
+| Variable | Purpose | Local example |
+| --- | --- | --- |
+| `DATABASE_URL` | SQLAlchemy MySQL connection URL | `mysql+pymysql://root:@127.0.0.1:3307/royal_spice?charset=utf8mb4` |
+| `SECRET_KEY` | Signs session and CSRF data; keep stable and secret | Generated random 64-character hex value |
+| `APP_ENV` | Environment marker; production requires an explicit secret | `development` |
+| `COOKIE_SECURE` | Set to `1` only when using HTTPS | `0` for local HTTP |
+
+If the MySQL password contains `@`, `#`, `/`, `:` or similar URL-reserved characters, **percent-encode** it in `DATABASE_URL`.
+
+**Time zone:** Booking times, promotion validity, and daily reports use the application machine's local time. Use **Asia/Dhaka** on a restaurant server in Bangladesh. There is no timezone selector in the current application.
+
+## 9. Using the Application
+
+### First-run checklist
+
+1. Sign in at `/admin/login` using the credentials you created.
+2. Check the preloaded menu in **Admin → Food Menu**.
+3. Edit the fictional address, telephone number, email, operating hours and capacity in **Admin → Settings**.
+4. Open `/menu` and add items to the cart.
+5. Apply an offer (optional), then complete checkout with a valid service type and contact details.
+6. Open the receipt; use **Admin → Orders & Billing** to update the order's workflow and payment status.
+7. Create a reservation request under `/reserve`, then confirm or cancel it in the admin dashboard.
+8. For a staff-entered bill, open **Admin → New POS Sale**.
+
+### Order and reservation statuses
+
+- **Orders:** `new` → `confirmed` → `preparing` → `ready` → `completed`; orders can also be `cancelled`.
+- **Payments:** `paid` or `unpaid`; this is updated manually by staff.
+- **Reservations:** `pending`, `confirmed`, `completed`, or `cancelled`.
+
+The admin dashboard and reports use **completed orders** for sales figures. They are not a substitute for a complete accounting system.
+
+## 10. Offers & Promotions
+
+Version 2 introduces promotion management at **Admin → Offers & Promotions**.
+
+| Setting | Behaviour |
 | --- | --- |
-| Original responsive landing page and About page | Protected login and dashboard |
-| Dynamic database-driven food menu and BDT prices | Food menu create/edit/delete/unpublish |
-| Add food to cart and edit quantities | View and update order statuses |
-| Delivery, takeaway, dine-in checkout | Manual POS sale and bill generation |
-| Order receipt with opaque, hard-to-guess link | Manually mark payments as paid/unpaid |
-| Reservation form with server-side capacity checks | Confirm/cancel reservations |
-| CSRF-protected order and reservation forms | Manage seating tables, staff, and inventory |
-| | Customer list, expenses, simple sales reports |
-| | Edit restaurant profile, address, opening hours |
+| Code | Unique coupon code such as `WELCOME10` |
+| Discount type | Percentage or fixed BDT amount |
+| Minimum order | Order subtotal required to redeem |
+| Maximum discount | Optional cap for percentage discounts |
+| Date window | Optional start and expiry date/time |
+| Usage limit | Optional maximum redemptions across orders |
+| Enabled | Allow/disallow redemption and public listing |
+| Featured | Display a qualifying offer on the homepage |
 
-### Typical flow
+### Demo offers created by `seed`
 
-1. Sign into the admin panel. Check the 10 preloaded foods on **Food Menu**.
-2. Open the public menu, add items, go to cart and checkout. Submit a **Cash** order.
-3. Return to **Admin → Orders & Billing**, mark the order **Completed** and the payment **Paid**.
-4. On **Dashboard**, today's completed sales will update. **Reports** will include the completed order.
-5. Visit **Book a Table**, enter a future time inside operating hours, and submit. In **Admin → Reservations**, set its status to **Confirmed**.
-6. Use **New POS Sale** for a staff-entered dine-in bill. Its completed/paid checkboxes affect dashboard totals.
+| Code | Benefit | Minimum subtotal |
+| --- | --- | --- |
+| `WELCOME10` | 10% off | No minimum |
+| `SPICE50` | ৳50 off | ৳500 |
 
-## Project structure
+**Customer flow:** Browse `/offers` → add menu items to cart → enter the code in the cart → confirm the discounted total at checkout.
+
+**Staff flow:** Open `/admin/pos` → enter order lines → enter the coupon code → save the POS order.
+
+The backend checks offer eligibility using the **database-calculated subtotal**, rechecks at checkout, saves the discount against the order in `order_discounts`, and increments the offer's usage count. **Only one code can apply to an order.** Existing pre-upgrade order totals remain unchanged. Currently, cancelling an order does **not automatically return** its redeemed coupon use.
+
+> Promo codes affect the bill total only. The application does not process actual card, bKash, or Nagad transactions.
+
+## 11. Project Structure
 
 ```text
 royal_spice/
-├── app.py                    # Flask routes, models and commands
-├── requirements.txt          # Python dependencies
-├── db_setup.sql              # Create database in XAMPP MySQL
-├── .env.example              # Environment variable example
+├── app.py                       # Flask application, ORM models, routes and CLI commands
+├── requirements.txt             # Python dependencies
+├── db_setup.sql                 # Creates the MySQL database (not its tables)
+├── .env.example                 # Example local environment variables
+├── .gitignore                   # Excludes secrets and generated files
+├── README.md                    # Main project documentation
+├── UPGRADE_GUIDE_MAC.md         # Concise macOS v1 → v2 migration checklist
+├── TAILWINDADMIN_LICENSE.txt    # Admin template licence
 ├── templates/
-│   ├── home.html             # Adapted Spice Haven homepage
-│   ├── menu.html             # Live menu from database
-│   ├── about.html
-│   ├── reserve.html           # Reservation POST form
-│   ├── cart.html
-│   ├── checkout.html
-│   ├── receipt.html
-│   └── admin/                # TailwindAdmin-derived dashboard pages
+│   ├── site_base.html           # Shared public-site layout
+│   ├── home.html                # Homepage
+│   ├── menu.html                # Dynamic food menu
+│   ├── offers.html              # Public promotions
+│   ├── about.html               # Restaurant introduction
+│   ├── cart.html                # Cart and coupon application
+│   ├── checkout.html            # Order placement
+│   ├── receipt.html             # Order receipt
+│   ├── reserve.html             # Reservation request form
+│   └── admin/                  # Dashboard, POS, orders, offers and management pages
 ├── static/
-│   ├── site/                 # Spice Haven CSS, JS, photos and video
-│   └── admin/                # TailwindAdmin compiled CSS, logo and images
-└── tests/                    # Pytest integration tests (optional)
+│   ├── site/                    # Restaurant CSS, JavaScript, images and videos
+│   └── admin/                   # Admin CSS, imagery and template assets
+└── tests/
+    └── test_app.py              # Automated tests using temporary SQLite
 ```
 
-## Quick test instructions
+## 12. Database and Data Management
 
-After following setup, open the browser and try a food order and reservation. To run automated SQLite-backed integration tests without changing your MySQL database:
+The application's ORM models correspond to the following main tables:
 
-```powershell
+| Area | Tables |
+| --- | --- |
+| Restaurant setup and access | `settings`, `admins` |
+| Catalogue | `menu_items` |
+| Sales and customers | `customers`, `orders`, `order_items` |
+| Promotions | `offers`, `order_discounts` |
+| Reservations | `restaurant_tables`, `reservations` |
+| Operations | `employees`, `inventory_items`, `expenses` |
+
+**Initialisation vs seeding**
+
+```bash
+python -m flask --app app init-db       # Create tables that do not yet exist
+python -m flask --app app seed          # Add missing fictional sample records
+python -m flask --app app create-admin  # Prompt for an admin account
+```
+
+To back up live or important test data, export the complete database from **phpMyAdmin → Export** before changing code or schemas. The application currently has **no Alembic/Flask-Migrate migration workflow**.
+
+## 13. Testing
+
+The repository contains integration tests that run against a temporary **SQLite** database rather than the XAMPP MySQL database.
+
+```bash
 python -m pip install pytest
 python -m pytest -q
 ```
 
-Tests override the database URL with a temporary SQLite database and disable CSRF **only for test requests**. Normal operation uses the XAMPP MySQL URL from `.env`.
+The tests cover key customer routes, sample data, ordering, reservation capacity, POS, offer redemption, and admin management. CSRF is disabled **only inside the test client**. A passing SQLite test suite does not by itself confirm MySQL connectivity or production readiness.
 
-## Important starter-project limitations
+**Manual smoke test:** load the homepage and menu; log into admin; place one test order; redeem a demo coupon; view its receipt; update the order status; and submit a reservation request.
 
-- This is a **development MVP, not production-ready software**. Before public deployment, add rate limiting, staff roles/permissions, tests against real MySQL, database migrations, monitoring, backups, TLS, proper secrets management and a production WSGI server.
-- Payment dropdowns for **Cash / Card / bKash / Nagad** record preferences. **No payment gateway, automatic verification, or charge is performed.** Staff mark received payments manually.
-- Reservations check aggregate 2-hour seating capacity and may be pending or confirmed. They **do not reserve a specific table**, combine tables for large groups, or sync external booking platforms. Admin must check actual seating assignment.
-- Inventory is **manual**; it does not deduct ingredients from recipes. Staff salaries are records, not automated payroll. Simple sales-minus-expenses reporting is not full accounting profit.
-- The POS records dine-in or takeaway orders. Delivery requires the public checkout to enter an address.
-- A customer receipt URL contains a random access token; share it privately. The demonstration does not include customer accounts, email, or SMS alerts.
-- Demo phone, email and website fields are **placeholders**, not real business contact details. Replace them in **Admin → Settings** before any public use.
-- The original template's imagery is **illustrative**; the food images are not individually mapped to the 10 sample menu items.
-- All times are interpreted as the **machine's local time**. For restaurant use, set the computer/server timezone to **Asia/Dhaka**.
+## 14. Troubleshooting
 
-## Credits and licenses
+| Symptom | Cause / resolution |
+| --- | --- |
+| `zsh: command not found: python` | Before virtualenv activation, use `python3`. |
+| `externally-managed-environment` | Install packages inside `venv`, not system/Homebrew Python. |
+| `source: no such file or directory: venv/bin/activate` | Run `python3 -m venv venv` from the project folder, then activate it. |
+| `No module named flask` | Activate the environment and run `python -m pip install -r requirements.txt`. |
+| `Can't connect to MySQL server ... 3306` | This build uses port **3307**. Confirm the updated `app.py` is installed and XAMPP MySQL is running. |
+| `Connection refused` on 3307 | Start MySQL in XAMPP and check the actual listening port with `lsof` or `nc`. |
+| MySQL `Access denied for user` | Verify database credentials and permissions in `.env`. |
+| `Unknown database 'royal_spice'` | Run `db_setup.sql` in phpMyAdmin; `init-db` only creates tables. |
+| Browser shows **HTTP 403** at port 5000 | On some Macs another service (including AirPlay Receiver) uses port 5000. Use Flask port **5055**. |
+| Browser opens an XAMPP page instead of Flask | Use **http://127.0.0.1:5055/**, not the bare `localhost` or an `htdocs` URL. |
+| `Address already in use` on 5055 | Stop the conflicting service or choose another available Flask port. |
+| `/admin/offers` redirects to login | Sign in with an administrator account created via `create-admin`. |
+| Valid promotion does not apply | Check enablement, dates, minimum order, usage limit, and exact code. |
 
-- **Spice Haven** (provided template): design and code by Rabina Vishwakarma, distributed by ThemeWagon. Credits retained in the adapted public footer. Refer to the supplied template's own license and attribution terms for any public deployment.
-- **TailwindAdmin** (provided template): MIT license copyright © 2023 Codescandy, copied into `TAILWINDADMIN_LICENSE.txt`.
+Useful diagnostics:
 
----
-To stop the dev server, press `Ctrl+C` in the terminal. Stop MySQL from the XAMPP Control Panel when you no longer need it.
+```bash
+python3 --version
+nc -vz 127.0.0.1 3307
+lsof -nP -iTCP:5055 -sTCP:LISTEN
+curl -i http://127.0.0.1:5055/
+```
+
+## 15. Security and Known Limitations
+
+### Existing precautions
+
+The starter includes administrator login with password hashing, CSRF protection on forms, server-calculated order totals, validation of discount rules, and private-token receipt URLs. These controls are not a complete security assessment.
+
+### Not included in this release
+
+- **Online payment processing:** Cash/Card/bKash/Nagad entries are selections only; no payment is collected or verified automatically.
+- **Recipe-based stock consumption:** Inventory changes are manual, not calculated from orders.
+- **Table-level reservation assignment:** Reservations check approximate aggregate capacity and require staff confirmation.
+- **Automated salary or payroll:** Employee salary values are informational records.
+- **Customer accounts and notifications:** No customer login, transactional email, or SMS alerts.
+- **Full accounting or tax calculation:** Reports are simple sales and expenses summaries.
+- **Fine-grained staff permissions:** The existing admin system does not offer separate cashier/manager role permissions.
+- **Production deployment controls:** No integrated migrations, rate limiting, backup scheduler, background jobs, or production WSGI configuration.
+
+**Before public deployment:** disable debug mode, use HTTPS with secure cookies, set a strong persistent `SECRET_KEY`, use a limited-privilege database account, review access controls, configure backups/monitoring, confirm template licences, and test thoroughly against production-like MySQL data.
